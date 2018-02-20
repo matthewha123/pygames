@@ -18,7 +18,7 @@ head = sH.SnakeHead(40, 40)
 count = 0
 
 bodies = []
-
+chance_of_food = .25
 
 f = GameObjects.Food(20, 20, "food")
 bodies.append(f)
@@ -26,25 +26,30 @@ bodies.append(f)
 b = GameObjects.Damage(65,35, 1)
 bodies.append(b)
 
+def move_GameObjects(bodies,dy):
+	for b in bodies:
+		b.move(dy)
+
 def draw_GameObjects(screen, bodies):
 	for b in bodies:
 		b.draw(screen)
 
 def generate_bodies(bodies):
-	global count
 	starting_x = {num for num in range(0,400,45)}
-	if(count > 300):
-		count = 0
-		empty_spaces = random.randint(0,3)
-		dmg_block_locations = random.sample(starting_x,8 - empty_spaces)
-		for x in dmg_block_locations:
-			bodies.append(GameObjects.Damage(x,40,random.randint(2,10)))
-		for x in (starting_x - dmg_block_locations):
-			pass
+	empty_spaces = random.randint(0,3)
+	dmg_block_locations = set(random.sample(starting_x,8 - empty_spaces))
+	for x in dmg_block_locations:
+		bodies.append(GameObjects.Damage(x,GameObjects.Damage.square,
+								   random.randint(2,10)))
+	
+	food_chance = random.randint(1,int(1/chance_of_food))
+	
+#	if(food_chance == 2):
+	for x in (starting_x - dmg_block_locations):
+		bodies.append(GameObjects.Food(x +(GameObjects.Damage.square-GameObjects.Food.square)/2,
+								 (GameObjects.Damage.square) + GameObjects.Food.square,"normal"))
 			
 		
-		
-
 while not done:
 	for event in pg.event.get():
 		if event.type == pg.QUIT:
@@ -54,7 +59,12 @@ while not done:
 	
 	
 	screen.fill((0,0,0))
-	generate_bodies(bodies)
+	
+	if(count>200):
+		generate_bodies(bodies)
+		count = 0
+	
+	move_GameObjects(bodies,2)
 	head.move(pg.mouse.get_pos())
 	head.detect_collisions(bodies,screen)
 	draw_GameObjects(screen,bodies)

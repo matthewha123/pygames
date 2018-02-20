@@ -18,9 +18,14 @@ class Food:
 
 	def destroy(self):
 		self.ignore = True
+	
+	def move(self,dy):
+		self.y = self.y + dy
+
 		
 	def draw(self,screen):
 		if not self.ignore:
+			self.rect = pg.Rect(self.x,self.y,self.square,self.square)
 			pg.draw.rect(screen, self.color, self.rect)
 
 
@@ -36,8 +41,12 @@ class Damage:
 		self.text = font.render(str(dmg),True,(255,255,255))
 		self.ignore = False
 	
+	def move(self,dy):
+		self.y = self.y + dy
+	
 	def draw(self,screen):
 		if not self.ignore:
+			self.rect = pg.Rect(self.x,self.y,self.square,self.square)
 			pg.draw.rect(screen,self.color,self.rect)
 			screen.blit(self.text, (self.x + (self.square - self.text.get_width())/2,
 							  self.y + (self.square- self.text.get_height())/2))
